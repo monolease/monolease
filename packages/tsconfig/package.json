@@ -1,0 +1,11 @@
+{
+  "name": "@monolease/tsconfig",
+  "private": true,
+  "exports": "./tsconfig.base.json",
+  "files": [
+    "tsconfig.base.json"
+  ],
+  "peerDependencies": {
+    "typescript": "*"
+  }
+}

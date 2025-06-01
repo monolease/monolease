@@ -1,0 +1,27 @@
+{
+  "name": "monolease",
+  "private": true,
+  "type": "module",
+  "packageManager": "yarn@4.9.1",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "check": "turbo run check",
+    "format-check": "turbo run format-check",
+    "format": "turbo run format",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "pr-check": "turbo run check format-check lint test",
+    "release": "yarn tsx scripts/release.ts"
+  },
+  "devDependencies": {
+    "@monolease/changelog": "workspace:*",
+    "@monolease/core": "workspace:*",
+    "@monolease/github": "workspace:*",
+    "@monolease/pkg-json-version": "workspace:*",
+    "tsx": "4.19.4",
+    "turbo": "2.5.4"
+  }
+}

@@ -1,0 +1,29 @@
+name: Pull Request
+on:
+  pull_request:
+jobs:
+  pr-check:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # fetch the entire history to get all tags and commits
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: yarn
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: yarn --immutable
+
+      - name: PR check
+        run: yarn pr-check

@@ -1,0 +1,42 @@
+name: Release Push
+on:
+  push:
+    branches:
+      - release
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write # Needed to push tags and create releases
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # fetch the entire history to get all tags and commits
+
+      - name: Setup git
+        run: git config user.name "github-actions[bot]" && git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: yarn
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: yarn --immutable
+
+      - name: Build
+        run: yarn build
+
+      - name: Release
+        env:
+          GH_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO_OWNER_AND_NAME: ${{ github.repository }}
+        run: yarn release

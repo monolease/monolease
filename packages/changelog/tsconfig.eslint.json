@@ -1,0 +1,5 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["**/*", "**/.*"], // ts will ignore dotfiles by default, so we need to include them explicitly if we want to lint them
+  "exclude": ["node_modules"]
+}
