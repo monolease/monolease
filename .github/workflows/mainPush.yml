@@ -3,8 +3,11 @@ on:
   push:
     branches:
       - main
+concurrency:
+  group: main-push
 jobs:
   release:
+    environment: main
     runs-on: ubuntu-24.04
     permissions:
       contents: write # Needed to push tags and create releases
