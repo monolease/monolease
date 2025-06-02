@@ -1,5 +1,6 @@
 import {execFile} from 'node:child_process';
 import {promisify} from 'node:util';
+import {trimStdout} from './nanoSpawn.js';
 
 const pExecFile = promisify(execFile);
 
@@ -14,11 +15,7 @@ export async function spawn(...args: Parameters<typeof pExecFile>) {
     encoding: 'utf8',
   });
 
-  // credit to https://github.com/sindresorhus/nano-spawn for the following line
-  const trimmedStdout =
-    stdout.at(-1) === '\n' ?
-      stdout.slice(0, stdout.at(-2) === '\r' ? -2 : -1)
-    : stdout;
+  const trimmedStdout = trimStdout(stdout);
 
   return {stdout: trimmedStdout, stderr};
 }
