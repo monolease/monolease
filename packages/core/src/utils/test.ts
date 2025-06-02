@@ -13,7 +13,7 @@ export async function setupTestRepo() {
 
   /** https://git-scm.com/docs/git#Documentation/git.txt-codeGITCONFIGGLOBALcode */
   process.env.GIT_CONFIG_GLOBAL = '/dev/null';
-  await git(['init'], repoDir);
+  await git(['init', '-b', 'main'], repoDir);
   await git(['config', 'user.email', 'john@example.com'], repoDir);
   await git(['config', 'user.name', 'John Doe'], repoDir);
 
