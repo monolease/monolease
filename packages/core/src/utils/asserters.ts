@@ -37,13 +37,5 @@ export function isStringRecord(x: unknown): x is Record<string, string> {
 }
 
 export function isAbbrevHash(x: unknown): x is string {
-  if (typeof x !== 'string') {
-    return false;
-  }
-
-  if (!gitAbbrevHashRegex.test(x)) {
-    return false;
-  }
-
-  return true;
+  return typeof x === 'string' && gitAbbrevHashRegex.test(x);
 }
