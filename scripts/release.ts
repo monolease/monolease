@@ -20,6 +20,7 @@ const config: ConfigInput = {
     branch: "main",
     identifier: "rc",
   },
+  pushTags: false,
 };
 
 const { onStableBranch, workspaces } = await release({ config });
@@ -52,24 +53,24 @@ const changelogs = addChangelogs(
   )
 );
 
-await createGitHubReleases({
-  workspaces: withNextVersion.map<
-    Parameters<typeof createGitHubReleases>[0]["workspaces"][number]
-  >((workspace) => ({
-    name: workspace.name,
-    // workspaces without nextVersion has already been filtered out
-    nextVersion: workspace.nextVersion!.raw,
-    changelog: changelogs.find((changelog) => changelog.name === workspace.name)
-      ?.changelog!,
-    prerelease: !onStableBranch,
-    // workspaces with nextVersion have a createdTag
-    createdTag: workspace.createdTag!,
-  })),
-  apiOptions: {
-    apiToken: GH_API_TOKEN,
-    repoOwnerAndName: GH_REPO_OWNER_AND_NAME,
-  },
-});
+// await createGitHubReleases({
+//   workspaces: withNextVersion.map<
+//     Parameters<typeof createGitHubReleases>[0]["workspaces"][number]
+//   >((workspace) => ({
+//     name: workspace.name,
+//     // workspaces without nextVersion has already been filtered out
+//     nextVersion: workspace.nextVersion!.raw,
+//     changelog: changelogs.find((changelog) => changelog.name === workspace.name)
+//       ?.changelog!,
+//     prerelease: !onStableBranch,
+//     // workspaces with nextVersion have a createdTag
+//     createdTag: workspace.createdTag!,
+//   })),
+//   apiOptions: {
+//     apiToken: GH_API_TOKEN,
+//     repoOwnerAndName: GH_REPO_OWNER_AND_NAME,
+//   },
+// });
 
 await publish(
   withNextVersion.map((workspace) => ({
