@@ -22,11 +22,22 @@ const config: ConfigInput = {
   },
 };
 
-const releaseResult = await release({ config });
+const { onStableBranch, workspaces } = await release({ config });
 
-const withNextVersion = releaseResult.workspaces.filter(
-  (workspace) => workspace.nextVersion
+await updatePkgJsonVersions(
+  workspaces.map((workspace) => {
+    const latestBranchTag =
+      workspace.latestVersion[onStableBranch ? "stable" : "prerelease"];
+
+    return {
+      dir: workspace.dir,
+      version:
+        workspace.nextVersion?.raw ?? latestBranchTag?.version.raw ?? "0.0.0",
+    };
+  })
 );
+
+const withNextVersion = workspaces.filter((workspace) => workspace.nextVersion);
 
 const changelogs = addChangelogs(
   withNextVersion.map<Parameters<typeof addChangelogs>[0][number]>(
@@ -34,7 +45,7 @@ const changelogs = addChangelogs(
       name: workspace.name,
       nextVersion: workspace.nextVersion!.raw,
       bumpedWorkspaceDependencies: workspace.bumpedWorkspaceDependencies,
-      commits: releaseResult.onStableBranch
+      commits: onStableBranch
         ? workspace.commits.sinceLatestStable
         : workspace.commits.sinceLatestPrelease,
     })
@@ -50,7 +61,7 @@ await createGitHubReleases({
     nextVersion: workspace.nextVersion!.raw,
     changelog: changelogs.find((changelog) => changelog.name === workspace.name)
       ?.changelog!,
-    prerelease: !releaseResult.onStableBranch,
+    prerelease: !onStableBranch,
     // workspaces with nextVersion have a createdTag
     createdTag: workspace.createdTag!,
   })),
@@ -60,18 +71,11 @@ await createGitHubReleases({
   },
 });
 
-await updatePkgJsonVersions(
-  withNextVersion.map((workspace) => ({
-    dir: workspace.dir,
-    version: workspace.nextVersion!.raw,
-  }))
-);
-
 await publish(
   withNextVersion.map((workspace) => ({
     workspaceName: workspace.name,
     access: "public",
-    tag: releaseResult.onStableBranch ? "latest" : "rc",
+    tag: onStableBranch ? "latest" : "rc",
     provenance: true,
   }))
 );
