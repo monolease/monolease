@@ -20,6 +20,7 @@
     "@monolease/changelog": "workspace:*",
     "@monolease/core": "workspace:*",
     "@monolease/github": "workspace:*",
+    "@monolease/npm-registry": "workspace:*",
     "@monolease/pkg-json-version": "workspace:*",
     "tsx": "4.19.4",
     "turbo": "2.5.4"
