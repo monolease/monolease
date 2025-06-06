@@ -2,6 +2,7 @@ import release, { type ConfigInput } from "@monolease/core";
 import addChangelogs from "@monolease/changelog";
 import createGitHubReleases from "@monolease/github";
 import updatePkgJsonVersions from "@monolease/pkg-json-version";
+import publish from "@monolease/npm-registry";
 
 const { GH_API_TOKEN, GH_REPO_OWNER_AND_NAME } = process.env;
 
@@ -62,8 +63,15 @@ await createGitHubReleases({
 await updatePkgJsonVersions(
   withNextVersion.map((workspace) => ({
     dir: workspace.dir,
-    nextVersion: workspace.nextVersion!.raw,
+    version: workspace.nextVersion!.raw,
   }))
 );
 
-// trigger pr
+await publish(
+  withNextVersion.map((workspace) => ({
+    workspaceName: workspace.name,
+    access: "public",
+    tag: releaseResult.onStableBranch ? "latest" : "rc",
+    provenance: true,
+  }))
+);

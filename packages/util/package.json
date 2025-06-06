@@ -1,5 +1,5 @@
 {
-  "name": "@monolease/core",
+  "name": "@monolease/util",
   "type": "module",
   "exports": "./dist/index.js",
   "files": [
@@ -11,19 +11,13 @@
     "format-check": "prettier . --check --cache-location=_unused",
     "format": "prettier . --write --cache-location=_unused",
     "lint": "eslint . --ext .js,.cjs,.mjs,.ts,.cts,.mts,.jsx,.tsx --max-warnings 0",
-    "test": "vitest run"
-  },
-  "dependencies": {
-    "@monolease/util": "workspace:*",
-    "semver": "7.7.2",
-    "tinyglobby": "0.2.14"
+    "test": "vitest run --passWithNoTests"
   },
   "devDependencies": {
     "@eslint/js": "9.28.0",
     "@monolease/prettier-config": "workspace:*",
     "@monolease/tsconfig": "workspace:*",
     "@types/node": "22.15.29",
-    "@types/semver": "7.7.0",
     "eslint": "9.28.0",
     "prettier": "3.5.3",
     "typescript": "5.8.3",
