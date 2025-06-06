@@ -1,3 +1,4 @@
+import {isObject, isStringArray, isStringRecord} from '@monolease/util';
 import {gitAbbrevHashRegex} from '../constants.js';
 import type {
   Commit,
@@ -6,12 +7,7 @@ import type {
   ConventionalCommitSubject,
   PkgJson,
 } from '../types.js';
-import {
-  isAbbrevHash,
-  isObject,
-  isStringArray,
-  isStringRecord,
-} from './asserters.js';
+import {isAbbrevHash} from './asserters.js';
 
 export function parseConfig(configInput: ConfigInput): Config {
   return {

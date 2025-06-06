@@ -1,7 +1,6 @@
-import {isObject} from './asserters.js';
+import {isObject, spawn} from '@monolease/util';
 import type {Commit} from '../types.js';
 import {parseCommit} from './parsers.js';
-import {spawn} from './spawn.js';
 
 export function git(args: string[], cwd?: string) {
   return spawn('git', args, {cwd});

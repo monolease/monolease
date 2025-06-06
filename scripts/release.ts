@@ -65,5 +65,3 @@ await updatePkgJsonVersions(
     nextVersion: workspace.nextVersion!.raw,
   }))
 );
-
-// trigger pr
