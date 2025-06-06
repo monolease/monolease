@@ -1,6 +1,5 @@
 {
   "name": "@monolease/prettier-config",
-  "private": true,
   "type": "module",
   "exports": "./dist/index.js",
   "files": [
@@ -20,11 +19,11 @@
   "devDependencies": {
     "@eslint/js": "9.28.0",
     "@monolease/tsconfig": "workspace:*",
-    "@types/node": "22.15.29",
+    "@types/node": "22.15.30",
     "eslint": "9.28.0",
     "prettier": "3.5.3",
     "typescript": "5.8.3",
-    "typescript-eslint": "8.33.0",
-    "vitest": "3.1.4"
+    "typescript-eslint": "8.33.1",
+    "vitest": "3.2.2"
   }
 }
