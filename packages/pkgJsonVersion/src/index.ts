@@ -4,27 +4,28 @@ import {join} from 'node:path';
 
 interface Workspace {
   dir: string;
-  nextVersion: string;
+  /**
+   * The version to set in the package.json file.
+   */
+  version: string;
 }
 
 export default async function updatePkgJsonVersions(workspaces: Workspace[]) {
   for (const workspace of workspaces) {
-    if (workspace.nextVersion) {
-      const pkgJsonPath = join(workspace.dir, 'package.json');
-      const fileString = await readFile(pkgJsonPath, 'utf8');
-      const pkgJson = JSON.parse(fileString) as unknown;
+    const pkgJsonPath = join(workspace.dir, 'package.json');
+    const fileString = await readFile(pkgJsonPath, 'utf8');
+    const pkgJson = JSON.parse(fileString) as unknown;
 
-      if (!isObject(pkgJson)) {
-        throw new Error(`Expected ${pkgJsonPath} to be an object`);
-      }
-
-      const newPkgJson = {
-        ...pkgJson,
-        version: workspace.nextVersion,
-      };
-
-      const newPkgJsonString = JSON.stringify(newPkgJson, null, 2);
-      await writeFile(pkgJsonPath, newPkgJsonString, 'utf8');
+    if (!isObject(pkgJson)) {
+      throw new Error(`Expected ${pkgJsonPath} to be an object`);
     }
+
+    const newPkgJson = {
+      ...pkgJson,
+      version: workspace.version,
+    };
+
+    const newPkgJsonString = JSON.stringify(newPkgJson, null, 2);
+    await writeFile(pkgJsonPath, newPkgJsonString, 'utf8');
   }
 }
