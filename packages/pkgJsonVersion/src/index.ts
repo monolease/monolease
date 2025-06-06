@@ -1,3 +1,4 @@
+import {isObject} from '@monolease/util';
 import {readFile, writeFile} from 'node:fs/promises';
 import {join} from 'node:path';
 
@@ -26,8 +27,4 @@ export default async function updatePkgJsonVersions(workspaces: Workspace[]) {
       await writeFile(pkgJsonPath, newPkgJsonString, 'utf8');
     }
   }
-}
-
-export function isObject(x: unknown): x is Record<PropertyKey, unknown> {
-  return typeof x === 'object' && x !== null && !Array.isArray(x);
 }
