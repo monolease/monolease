@@ -1,5 +1,9 @@
 {
   "name": "monolease",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/monolease/monolease.git"
+  },
   "private": true,
   "type": "module",
   "packageManager": "yarn@4.9.2",

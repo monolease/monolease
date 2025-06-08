@@ -1,5 +1,10 @@
 {
   "name": "@monolease/tsconfig",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/monolease/monolease.git",
+    "directory": "packages/tsconfig"
+  },
   "exports": "./tsconfig.base.json",
   "files": [
     "tsconfig.base.json"

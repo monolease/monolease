@@ -1,5 +1,10 @@
 {
   "name": "@monolease/prettier-config",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/monolease/monolease.git",
+    "directory": "packages/prettier-config"
+  },
   "type": "module",
   "exports": "./dist/index.js",
   "files": [
