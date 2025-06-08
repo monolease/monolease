@@ -41,6 +41,8 @@ jobs:
         run: yarn --immutable
 
       - name: Build
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: yarn build
 
       - name: Release
