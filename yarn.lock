@@ -404,9 +404,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@monolease/pkg-json-version@workspace:*, @monolease/pkg-json-version@workspace:packages/pkgJsonVersion":
+"@monolease/pkg-json-version@workspace:*, @monolease/pkg-json-version@workspace:packages/pkg-json-version":
   version: 0.0.0-use.local
-  resolution: "@monolease/pkg-json-version@workspace:packages/pkgJsonVersion"
+  resolution: "@monolease/pkg-json-version@workspace:packages/pkg-json-version"
   dependencies:
     "@eslint/js": "npm:9.28.0"
     "@monolease/prettier-config": "workspace:*"
