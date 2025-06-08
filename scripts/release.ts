@@ -72,11 +72,11 @@ await createGitHubReleases({
   },
 });
 
-// await publish(
-//   withNextVersion.map((workspace) => ({
-//     workspaceName: workspace.name,
-//     access: "public",
-//     tag: onStableBranch ? "latest" : "rc",
-//     provenance: true,
-//   }))
-// );
+await publish(
+  withNextVersion.map((workspace) => ({
+    workspaceName: workspace.name,
+    access: "public",
+    tag: onStableBranch ? "latest" : "rc",
+    provenance: true,
+  }))
+);
