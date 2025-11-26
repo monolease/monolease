@@ -77,6 +77,5 @@ await publish(
     workspaceName: workspace.name,
     access: "public",
     tag: onStableBranch ? "latest" : "rc",
-    provenance: true,
   }))
 );
