@@ -42,6 +42,9 @@ importers:
       '@eslint/js':
         specifier: 9.28.0
         version: 9.28.0
+      '@monholm/eslint-config':
+        specifier: 2.0.0
+        version: 2.0.0(eslint@9.28.0)(typescript-eslint@8.33.1(eslint@9.28.0)(typescript@5.8.3))(typescript@5.8.3)
       '@monholm/prettier-config':
         specifier: 1.0.1
         version: 1.0.1(prettier@3.5.3)
@@ -82,6 +85,9 @@ importers:
       '@eslint/js':
         specifier: 9.28.0
         version: 9.28.0
+      '@monholm/eslint-config':
+        specifier: 2.0.0
+        version: 2.0.0(eslint@9.28.0)(typescript-eslint@8.33.1(eslint@9.28.0)(typescript@5.8.3))(typescript@5.8.3)
       '@monholm/prettier-config':
         specifier: 1.0.1
         version: 1.0.1(prettier@3.5.3)
@@ -115,6 +121,9 @@ importers:
       '@eslint/js':
         specifier: 9.28.0
         version: 9.28.0
+      '@monholm/eslint-config':
+        specifier: 2.0.0
+        version: 2.0.0(eslint@9.28.0)(typescript-eslint@8.33.1(eslint@9.28.0)(typescript@5.8.3))(typescript@5.8.3)
       '@monholm/prettier-config':
         specifier: 1.0.1
         version: 1.0.1(prettier@3.5.3)
@@ -149,6 +158,9 @@ importers:
       '@eslint/js':
         specifier: 9.28.0
         version: 9.28.0
+      '@monholm/eslint-config':
+        specifier: 2.0.0
+        version: 2.0.0(eslint@9.28.0)(typescript-eslint@8.33.1(eslint@9.28.0)(typescript@5.8.3))(typescript@5.8.3)
       '@monholm/prettier-config':
         specifier: 1.0.1
         version: 1.0.1(prettier@3.5.3)
@@ -183,6 +195,9 @@ importers:
       '@eslint/js':
         specifier: 9.28.0
         version: 9.28.0
+      '@monholm/eslint-config':
+        specifier: 2.0.0
+        version: 2.0.0(eslint@9.28.0)(typescript-eslint@8.33.1(eslint@9.28.0)(typescript@5.8.3))(typescript@5.8.3)
       '@monholm/prettier-config':
         specifier: 1.0.1
         version: 1.0.1(prettier@3.5.3)
@@ -213,6 +228,9 @@ importers:
       '@eslint/js':
         specifier: 9.28.0
         version: 9.28.0
+      '@monholm/eslint-config':
+        specifier: 2.0.0
+        version: 2.0.0(eslint@9.28.0)(typescript-eslint@8.33.1(eslint@9.28.0)(typescript@5.8.3))(typescript@5.8.3)
       '@monholm/prettier-config':
         specifier: 1.0.1
         version: 1.0.1(prettier@3.5.3)
@@ -456,6 +474,13 @@ packages:
 
   '@jridgewell/sourcemap-codec@1.5.5':
     resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==}
+
+  '@monholm/eslint-config@2.0.0':
+    resolution: {integrity: sha512-yYfP8hl6WarBEsQWrA/Zxq2wu9gkOJyosr0OpHxdGN24YKzHJ+1gAqb+rxl9KGcf5KFIGr4GOR4o/3tndlVO6g==}
+    peerDependencies:
+      eslint: '>= 9.22.0'
+      typescript: '*'
+      typescript-eslint: '>= 8.0.0'
 
   '@monholm/prettier-config@1.0.1':
     resolution: {integrity: sha512-LgHLBxe1GANrSkt7IqPWfdGT/vitzVrhsWzV+Tu8L2gdi0ZXLP3FE4ydKu75oUfUDP1qPRl1h3b0Z85N/fsRmQ==}
@@ -1467,6 +1492,13 @@ snapshots:
   '@humanwhocodes/retry@0.4.3': {}
 
   '@jridgewell/sourcemap-codec@1.5.5': {}
+
+  '@monholm/eslint-config@2.0.0(eslint@9.28.0)(typescript-eslint@8.33.1(eslint@9.28.0)(typescript@5.8.3))(typescript@5.8.3)':
+    dependencies:
+      '@eslint/js': 9.28.0
+      eslint: 9.28.0
+      typescript: 5.8.3
+      typescript-eslint: 8.33.1(eslint@9.28.0)(typescript@5.8.3)
 
   '@monholm/prettier-config@1.0.1(prettier@3.5.3)':
     dependencies:

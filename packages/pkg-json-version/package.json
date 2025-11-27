@@ -24,6 +24,7 @@
   "devDependencies": {
     "@eslint/js": "9.28.0",
     "@monholm/prettier-config": "1.0.1",
+    "@monholm/eslint-config": "2.0.0",
     "@monholm/tsconfig": "2.0.0",
     "@types/node": "24.10.1",
     "eslint": "9.28.0",
