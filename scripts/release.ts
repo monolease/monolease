@@ -20,7 +20,6 @@ const config: ConfigInput = {
     branch: "main",
     identifier: "rc",
   },
-  pushTags: false,
 };
 
 const { onStableBranch, workspaces } = await release({ config });
@@ -77,5 +76,6 @@ await publish(
     workspaceName: workspace.name,
     access: "public",
     tag: onStableBranch ? "latest" : "rc",
+    packageManager: "pnpm",
   }))
 );

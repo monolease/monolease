@@ -1,3 +1,3 @@
-import config from '@monolease/prettier-config';
+import config from '@monholm/prettier-config';
 
 export default config;
