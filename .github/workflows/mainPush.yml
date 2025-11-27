@@ -14,34 +14,37 @@ jobs:
       id-token: write # Needed for npm publish provenance
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v4
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # 5.0.1
         with:
           fetch-depth: 0 # fetch the entire history to get all tags and commits
 
       - name: Setup git
         run: git config user.name "github-actions[bot]" && git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+      - name: Setup node
+        uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # 6.0.0
+        with:
+          node-version-file: .node-version
+
       - name: Enable corepack
         run: corepack enable
 
       - name: Setup node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # 6.0.0
         with:
           node-version-file: .node-version
-          cache: yarn
-
-      - name: Enable corepack
-        run: corepack enable
+          cache: "pnpm"
 
       - name: Install dependencies
-        run: yarn --immutable
+        run: pnpm i
 
       - name: Build
-        run: yarn build
+        run: pnpm build
 
       - name: Release
         env:
           GH_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO_OWNER_AND_NAME: ${{ github.repository }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: yarn release
+          NPM_CONFIG_PROVENANCE: true
+        run: pnpm release
