@@ -18,6 +18,7 @@
     "release": "pnpm tsx scripts/release.ts"
   },
   "devDependencies": {
+    "@types/node": "24.10.1",
     "@monolease/changelog": "workspace:*",
     "@monolease/core": "workspace:*",
     "@monolease/github": "workspace:*",
