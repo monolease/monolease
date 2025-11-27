@@ -2,6 +2,7 @@
   "extends": "@monholm/tsconfig",
   "compilerOptions": {
     "outDir": "dist",
+    "declaration": true,
     "module": "nodenext"
   },
   "include": ["src/**/*"],
