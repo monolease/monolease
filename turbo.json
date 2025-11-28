@@ -11,12 +11,8 @@
     "lint": {
       "dependsOn": ["^build"]
     },
-    "format-check": {
-      "dependsOn": ["@monolease/prettier-config#build"]
-    },
-    "format": {
-      "dependsOn": ["@monolease/prettier-config#build"]
-    },
+    "format-check": {},
+    "format": {},
     "test": {
       "dependsOn": ["^build"]
     }

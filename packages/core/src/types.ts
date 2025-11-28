@@ -61,3 +61,5 @@ export interface ReleaseTag {
   version: SemVer;
   packageName: string;
 }
+
+export type PackageManager = 'npm' | 'yarn' | 'pnpm';

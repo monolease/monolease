@@ -20,10 +20,12 @@ const config: ConfigInput = {
     branch: "main",
     identifier: "rc",
   },
-  pushTags: false,
 };
 
-const { onStableBranch, workspaces } = await release({ config });
+const { onStableBranch, workspaces } = await release({
+  config,
+  packageManager: "pnpm",
+});
 
 await updatePkgJsonVersions(
   workspaces.map((workspace) => {
@@ -77,6 +79,6 @@ await publish(
     workspaceName: workspace.name,
     access: "public",
     tag: onStableBranch ? "latest" : "rc",
-    provenance: true,
+    packageManager: "pnpm",
   }))
 );

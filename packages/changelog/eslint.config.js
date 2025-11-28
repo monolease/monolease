@@ -1,10 +1,8 @@
-import eslint from '@eslint/js';
-import tseslint from 'typescript-eslint';
+import {defineConfig} from 'eslint/config';
+import eslintConfig from '@monholm/eslint-config';
 
-export default tseslint.config(
-  eslint.configs.recommended,
-  tseslint.configs.strictTypeChecked,
-  tseslint.configs.stylisticTypeChecked,
+export default defineConfig(
+  eslintConfig,
   {
     languageOptions: {
       parserOptions: {

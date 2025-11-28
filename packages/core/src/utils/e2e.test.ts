@@ -61,7 +61,7 @@ describe('e2e', () => {
   it('should have no latest version when no release tags', async () => {
     await setupRootWorkspace();
     await addWorkspaces();
-    const result = await run({config, cwd: repoDir});
+    const result = await run({config, packageManager: 'yarn', cwd: repoDir});
     for (const workspace of result.workspaces) {
       expect(workspace.latestVersion.overall).toBeUndefined();
       expect(workspace.latestVersion.prerelease).toBeUndefined();
@@ -89,7 +89,7 @@ describe('e2e', () => {
       repoDir,
     );
 
-    const result = await run({config, cwd: repoDir});
+    const result = await run({config, packageManager: 'yarn', cwd: repoDir});
     for (const workspace of result.workspaces) {
       expect(workspace.latestVersion.overall?.raw).toBe(
         `${workspace.name}@1.0.0`,
@@ -108,7 +108,7 @@ describe('e2e', () => {
     await addWorkspaces();
     await gitAdd({all: true}, repoDir);
     await commit('feat: initial commit', repoDir);
-    const result = await run({config, cwd: repoDir});
+    const result = await run({config, packageManager: 'yarn', cwd: repoDir});
     for (const workspace of result.workspaces) {
       expect(workspace.nextVersion?.raw).toBe('1.0.0');
     }
@@ -120,7 +120,7 @@ describe('e2e', () => {
     await checkoutBranch(prereleaseBranch, repoDir);
     await gitAdd({all: true}, repoDir);
     await commit('feat: initial commit', repoDir);
-    const result = await run({config, cwd: repoDir});
+    const result = await run({config, packageManager: 'yarn', cwd: repoDir});
     for (const workspace of result.workspaces) {
       expect(workspace.nextVersion?.raw).toBe(
         `1.0.0-${prereleaseIdentifier}.0`,
@@ -134,12 +134,12 @@ describe('e2e', () => {
     await addWorkspaces();
     await gitAdd({all: true}, repoDir);
     await commit('feat: initial commit', repoDir);
-    await run({config, cwd: repoDir});
+    await run({config, packageManager: 'yarn', cwd: repoDir});
     const prereleaseTags = await listTags(undefined, repoDir);
     expect(prereleaseTags).toStrictEqual(['a@1.0.0-rc.0', 'b@1.0.0-rc.0']);
     await checkoutBranch(stableBranch, repoDir);
     await mergeBranch(prereleaseBranch, repoDir);
-    await run({config, cwd: repoDir});
+    await run({config, packageManager: 'yarn', cwd: repoDir});
     const stableTags = await listTags(undefined, repoDir);
     expect(stableTags).toStrictEqual([
       'a@1.0.0',
@@ -154,12 +154,12 @@ describe('e2e', () => {
     await addWorkspaces();
     await gitAdd({all: true}, repoDir);
     await commit('feat: initial commit', repoDir);
-    await run({config, cwd: repoDir});
+    await run({config, packageManager: 'yarn', cwd: repoDir});
     const stableTags = await listTags(undefined, repoDir);
     expect(stableTags).toStrictEqual(['a@1.0.0', 'b@1.0.0']);
     await checkoutBranch(prereleaseBranch, repoDir);
     await mergeBranch(stableBranch, repoDir);
-    await run({config, cwd: repoDir});
+    await run({config, packageManager: 'yarn', cwd: repoDir});
     const prereleaseTags = await listTags(undefined, repoDir);
     expect(prereleaseTags).toStrictEqual([
       'a@1.0.0',
@@ -174,7 +174,7 @@ describe('e2e', () => {
     await addWorkspaces();
     await gitAdd({all: true}, repoDir);
     await commit('feat: initial commit', repoDir);
-    await run({config, cwd: repoDir});
+    await run({config, packageManager: 'yarn', cwd: repoDir});
     let tags = await listTags(undefined, repoDir);
     expect(tags).toStrictEqual(['a@1.0.0', 'b@1.0.0']);
     await checkoutBranch(prereleaseBranch, repoDir);
@@ -182,7 +182,7 @@ describe('e2e', () => {
     await writeFile(join(repoDir, 'packages/a', 'README.md'), 'test');
     await gitAdd({all: true}, repoDir);
     await commit('feat: add readme', repoDir);
-    await run({config, cwd: repoDir});
+    await run({config, packageManager: 'yarn', cwd: repoDir});
     tags = await listTags(undefined, repoDir);
     expect(tags).toStrictEqual([
       'a@1.0.0',
@@ -194,7 +194,7 @@ describe('e2e', () => {
     await writeFile(join(repoDir, 'packages/a', 'index.js'), 'fix');
     await gitAdd({all: true}, repoDir);
     await commit('fix: update index.js', repoDir);
-    await run({config, cwd: repoDir});
+    await run({config, packageManager: 'yarn', cwd: repoDir});
     tags = await listTags(undefined, repoDir);
     expect(tags).toStrictEqual([
       'a@1.0.0',
@@ -206,7 +206,7 @@ describe('e2e', () => {
     ]);
     await checkoutBranch(prereleaseBranch, repoDir);
     await mergeBranch(stableBranch, repoDir);
-    await run({config, cwd: repoDir});
+    await run({config, packageManager: 'yarn', cwd: repoDir});
     tags = await listTags(undefined, repoDir);
     expect(tags).toStrictEqual([
       'a@1.0.0',
@@ -225,13 +225,13 @@ describe('e2e', () => {
     await addWorkspaces();
     await gitAdd({all: true}, repoDir);
     await commit('feat: initial commit', repoDir);
-    await run({config, cwd: repoDir});
+    await run({config, packageManager: 'yarn', cwd: repoDir});
     let tags = await listTags(undefined, repoDir);
     expect(tags).toStrictEqual(['a@1.0.0', 'b@1.0.0']);
     await writeFile(join(repoDir, 'packages/b', 'README.md'), 'test');
     await gitAdd({all: true}, repoDir);
     await commit('feat!: add readme', repoDir);
-    await run({config, cwd: repoDir});
+    await run({config, packageManager: 'yarn', cwd: repoDir});
     tags = await listTags(undefined, repoDir);
     expect(tags).toStrictEqual(['a@1.0.0', 'b@1.0.0', 'b@2.0.0']);
     await checkoutBranch(prereleaseBranch, repoDir);
@@ -239,7 +239,7 @@ describe('e2e', () => {
     await writeFile(join(repoDir, 'packages/b', 'index.js'), 'fix');
     await gitAdd({all: true}, repoDir);
     await commit('fix: update index.js', repoDir);
-    await run({config, cwd: repoDir});
+    await run({config, packageManager: 'yarn', cwd: repoDir});
     tags = await listTags(undefined, repoDir);
     expect(tags).toStrictEqual([
       'a@1.0.0',

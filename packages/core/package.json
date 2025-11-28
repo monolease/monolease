@@ -21,13 +21,15 @@
   "dependencies": {
     "@monolease/util": "workspace:*",
     "semver": "7.7.2",
-    "tinyglobby": "0.2.14"
+    "tinyglobby": "0.2.14",
+    "yaml": "2.8.1"
   },
   "devDependencies": {
     "@eslint/js": "9.28.0",
-    "@monolease/prettier-config": "workspace:*",
-    "@monolease/tsconfig": "workspace:*",
-    "@types/node": "22.15.30",
+    "@monholm/prettier-config": "1.0.1",
+    "@monholm/eslint-config": "2.0.0",
+    "@monholm/tsconfig": "2.0.0",
+    "@types/node": "24.10.1",
     "@types/semver": "7.7.0",
     "eslint": "9.28.0",
     "prettier": "3.5.3",

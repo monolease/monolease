@@ -6,24 +6,24 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v4
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # 5.0.1
+
+      - name: Setup node
+        uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # 6.0.0
         with:
-          fetch-depth: 0 # fetch the entire history to get all tags and commits
+          node-version-file: .node-version
 
       - name: Enable corepack
         run: corepack enable
 
       - name: Setup node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # 6.0.0
         with:
           node-version-file: .node-version
-          cache: yarn
-
-      - name: Enable corepack
-        run: corepack enable
+          cache: "pnpm"
 
       - name: Install dependencies
-        run: yarn --immutable
+        run: pnpm i
 
       - name: PR check
-        run: yarn pr-check
+        run: pnpm pr-check

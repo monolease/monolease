@@ -1,7 +1,9 @@
 {
-  "extends": "@monolease/tsconfig",
+  "extends": "@monholm/tsconfig",
   "compilerOptions": {
-    "outDir": "dist"
+    "outDir": "dist",
+    "declaration": true,
+    "module": "nodenext"
   },
   "include": ["src/**/*"],
   "exclude": ["src/**/*.test.ts"]
