@@ -18,12 +18,12 @@
     "release": "pnpm tsx scripts/release.ts"
   },
   "devDependencies": {
-    "@types/node": "24.10.1",
     "@monolease/changelog": "workspace:*",
     "@monolease/core": "workspace:*",
     "@monolease/github": "workspace:*",
     "@monolease/npm-registry": "workspace:*",
     "@monolease/pkg-json-version": "workspace:*",
+    "@types/node": "24.10.1",
     "tsx": "4.19.4",
     "turbo": "2.5.4"
   }
