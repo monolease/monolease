@@ -47,4 +47,4 @@ jobs:
           GH_REPO_OWNER_AND_NAME: ${{ github.repository }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
-        run: pnpm release
+        run: pnpm config list
