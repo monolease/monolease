@@ -22,7 +22,10 @@ const config: ConfigInput = {
   },
 };
 
-const { onStableBranch, workspaces } = await release({ config });
+const { onStableBranch, workspaces } = await release({
+  config,
+  packageManager: "pnpm",
+});
 
 await updatePkgJsonVersions(
   workspaces.map((workspace) => {
