@@ -24,7 +24,7 @@
     "@monolease/npm-registry": "workspace:*",
     "@monolease/pkg-json-version": "workspace:*",
     "@types/node": "24.10.1",
-    "tsx": "4.19.4",
-    "turbo": "2.5.4"
+    "tsx": "4.20.6",
+    "turbo": "2.6.1"
   }
 }
