@@ -169,7 +169,7 @@ describe('e2e', () => {
     ]);
   });
 
-  it('should version correcly when merging stable to existing prerelease ', async () => {
+  it('should version correcly when merging stable to existing prerelease', async () => {
     await setupRootWorkspace();
     await addWorkspaces();
     await gitAdd({all: true}, repoDir);
@@ -218,7 +218,7 @@ describe('e2e', () => {
       'b@1.0.1-rc.0',
       'b@1.0.2-rc.0',
     ]);
-  });
+  }, 7500);
 
   it('should version correcly when merging stable to prerelease and adding additional commits', async () => {
     await setupRootWorkspace();

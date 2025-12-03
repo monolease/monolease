@@ -12,11 +12,14 @@ export interface ConfigInput {
     | undefined;
   pushTags?: boolean | undefined;
   dryRun?: boolean | undefined;
+  bumpOnLockfileChange?: boolean | undefined;
 }
 
-export interface Config extends Omit<ConfigInput, 'pushTags' | 'dryRun'> {
+export interface Config
+  extends Omit<ConfigInput, 'pushTags' | 'dryRun' | 'bumpOnLockfileChange'> {
   dryRun: boolean;
   pushTags: boolean;
+  bumpOnLockfileChange: boolean;
 }
 
 export interface PkgJson {

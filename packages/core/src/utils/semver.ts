@@ -26,6 +26,10 @@ function calculateNextVersion({
   workspace,
   prereleaseIdentifier,
 }: CalculateNextVersionOptions) {
+  // on the prerelease branch,
+  // use commits since the latest prerelease version for changelog and bump type
+  // but use the latest version of either stable or prerelease as the base version
+  // for determining the next version
   let nextVersionString: string | null = null;
   if (workspace.bumpLevel || workspace.bumpedWorkspaceDependencies.length) {
     let _bumpLevel: ReleaseType = workspace.bumpLevel ?? 'patch';
@@ -78,11 +82,6 @@ export function addNextVersions({
   workspaces,
   config,
 }: AddNextVersionsOptions) {
-  // on the prelease branch.
-  // use commits since the latest prerelease version for changelog and bump type
-  // but use the latest version of either stable or prerelease as the base version
-  // for determining the next version
-
   return workspaces.map(workspace => {
     const nextVersion = calculateNextVersion({
       onStableBranch,

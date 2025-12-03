@@ -1,7 +1,8 @@
-import type {ConventionalCommit} from '@monolease/core';
+import type {ConventionalCommit, Commit} from '@monolease/core';
 
 interface GenerateChangelogOptions {
-  commits: ConventionalCommit[];
+  conventionalCommits: ConventionalCommit[];
+  commitsTouchingLockFile: Commit[];
   nextVersion: string;
   bumpedWorkspaceDependencies: {
     name: string;
@@ -11,26 +12,34 @@ interface GenerateChangelogOptions {
 
 function generateChangelog({
   bumpedWorkspaceDependencies,
-  commits,
+  conventionalCommits,
+  commitsTouchingLockFile,
   nextVersion,
 }: GenerateChangelogOptions) {
   let fixes = '';
   let features = '';
   let breakingChanges = '';
   let dependencyBumps = '';
+  let lockFileChanges = '';
 
-  for (const commit of commits) {
-    const scope = commit.subject.scope ? `**${commit.subject.scope}:** ` : '';
-    const change = `- ${scope}${commit.subject.description} (${commit.abbrevHash})\n`;
+  for (const conventionalCommit of conventionalCommits) {
+    const scope =
+      conventionalCommit.subject.scope ?
+        `**${conventionalCommit.subject.scope}:** `
+      : '';
+    const change = `- ${scope}${conventionalCommit.subject.description} (${conventionalCommit.abbrevHash})\n`;
     let breaking: string | undefined;
-    if (commit.subject.breaking || commit.body?.breakingChangeDescription) {
-      breaking = `- ${scope}${commit.body?.breakingChangeDescription ?? commit.subject.description} (${commit.abbrevHash})\n`;
+    if (
+      conventionalCommit.subject.breaking ||
+      conventionalCommit.body?.breakingChangeDescription
+    ) {
+      breaking = `- ${scope}${conventionalCommit.body?.breakingChangeDescription ?? conventionalCommit.subject.description} (${conventionalCommit.abbrevHash})\n`;
     }
 
-    if (commit.subject.type === 'feat') {
+    if (conventionalCommit.subject.type === 'feat') {
       features += change;
     }
-    if (commit.subject.type === 'fix') {
+    if (conventionalCommit.subject.type === 'fix') {
       fixes += change;
     }
     if (breaking) {
@@ -40,6 +49,10 @@ function generateChangelog({
 
   for (const dep of bumpedWorkspaceDependencies) {
     dependencyBumps += `- **${dep.name}** bumped to ${dep.version}\n`;
+  }
+
+  for (const lockFileCommit of commitsTouchingLockFile) {
+    lockFileChanges += `- ${lockFileCommit.subject} (${lockFileCommit.abbrevHash})\n`;
   }
 
   let changelog = `# ${nextVersion} (${new Date().toISOString().slice(0, 10)})`;
@@ -56,6 +69,9 @@ function generateChangelog({
   if (breakingChanges) {
     changelog += `\n## Breaking Changes\n${breakingChanges}`;
   }
+  if (lockFileChanges) {
+    changelog += `\n## Lockfile Changes\n${lockFileChanges}`;
+  }
 
   return changelog;
 }
@@ -63,7 +79,8 @@ function generateChangelog({
 interface Workspace {
   name: string;
   nextVersion: string;
-  commits: ConventionalCommit[];
+  conventionalCommits: ConventionalCommit[];
+  commitsTouchingLockFile: Commit[];
   bumpedWorkspaceDependencies: string[];
 }
 
@@ -92,7 +109,15 @@ export default function generateChangelogs(workspaces: Workspace[]) {
 
     const changelog = generateChangelog({
       bumpedWorkspaceDependencies: mappedWorkspaceDependencies,
-      commits: workspace.commits,
+      conventionalCommits: workspace.conventionalCommits,
+      // exclude lockfile commits that are already included as conventional commits
+      // so that they don't appear twice in the changelog
+      commitsTouchingLockFile: workspace.commitsTouchingLockFile.filter(
+        lockFileCommit =>
+          !workspace.conventionalCommits.some(
+            cc => cc.abbrevHash === lockFileCommit.abbrevHash,
+          ),
+      ),
       nextVersion: workspace.nextVersion,
     });
 

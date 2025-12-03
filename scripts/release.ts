@@ -20,6 +20,7 @@ const config: ConfigInput = {
     branch: "main",
     identifier: "rc",
   },
+  bumpOnLockfileChange: true,
 };
 
 const { onStableBranch, workspaces } = await release({
@@ -48,9 +49,12 @@ const changelogs = addChangelogs(
       name: workspace.name,
       nextVersion: workspace.nextVersion!.raw,
       bumpedWorkspaceDependencies: workspace.bumpedWorkspaceDependencies,
-      commits: onStableBranch
-        ? workspace.commits.sinceLatestStable
-        : workspace.commits.sinceLatestPrelease,
+      conventionalCommits: onStableBranch
+        ? workspace.commits.sinceLatestStable.conventionalTouchingWorkspace
+        : workspace.commits.sinceLatestPrerelease.conventionalTouchingWorkspace,
+      commitsTouchingLockFile: onStableBranch
+        ? workspace.commits.sinceLatestStable.touchingLockfile
+        : workspace.commits.sinceLatestPrerelease.touchingLockfile,
     })
   )
 );
