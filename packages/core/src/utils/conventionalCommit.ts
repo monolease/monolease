@@ -193,7 +193,7 @@ export function addBumpLevels({
         bumpLevel = 'patch';
       }
     } else {
-      // get all prerelease conventional commits that that are not already released on stable
+      // get all prerelease conventional commits that are not already released on stable
       // i.e. the commits are waiting for release on both branches
       const filteredWorkspaceCommits =
         workspace.commits.sinceLatestPrerelease.conventionalTouchingWorkspace.filter(
