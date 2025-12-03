@@ -3,8 +3,9 @@ import {
   subjectRegex,
   breakingChangeFooterRegex,
   calculateSemverIncLevel,
+  addBumpLevels,
 } from './conventionalCommit.js';
-import type {ConventionalCommit} from '../types.js';
+import type {ConventionalCommit, Commit} from '../types.js';
 
 describe('subjectRegex', () => {
   it('matches basic feat commit', () => {
@@ -354,5 +355,391 @@ describe('calculateSemverIncLevel', () => {
       },
     ];
     expect(calculateSemverIncLevel(commits)).toBe('patch');
+  });
+});
+
+describe('addBumpLevels', () => {
+  const createWorkspace = ({
+    name,
+    conventionalCommitsSinceStable = [],
+    conventionalCommitsSincePrerelease = [],
+    lockfileCommitsSinceStable = [],
+    lockfileCommitsSincePrerelease = [],
+  }: {
+    name: string;
+    conventionalCommitsSinceStable?: ConventionalCommit[];
+    conventionalCommitsSincePrerelease?: ConventionalCommit[];
+    lockfileCommitsSinceStable?: Commit[];
+    lockfileCommitsSincePrerelease?: Commit[];
+  }) => ({
+    name,
+    dir: `/packages/${name}`,
+    pkgJson: {name},
+    latestVersion: {
+      stable: undefined,
+      prerelease: undefined,
+      overall: undefined,
+    },
+    commits: {
+      sinceLatestStable: {
+        conventionalTouchingWorkspace: conventionalCommitsSinceStable,
+        touchingLockfile: lockfileCommitsSinceStable,
+      },
+      sinceLatestPrerelease: {
+        conventionalTouchingWorkspace: conventionalCommitsSincePrerelease,
+        touchingLockfile: lockfileCommitsSincePrerelease,
+      },
+    },
+    workspaceDeps: [],
+    workspaceDependencies: [],
+  });
+
+  describe('on stable branch', () => {
+    describe('with bumpOnLockfileChange enabled', () => {
+      it('should bump patch when only lockfile changed', () => {
+        const workspaces = [
+          createWorkspace({
+            name: 'pkg-a',
+            lockfileCommitsSinceStable: [
+              {abbrevHash: 'abc123', subject: 'chore: update deps'},
+            ],
+          }),
+        ];
+
+        const result = addBumpLevels({
+          workspaces,
+          onStableBranch: true,
+          bumpOnLockfileChange: true,
+        });
+
+        expect(result[0]?.bumpLevel).toBe('patch');
+      });
+
+      it('should use conventional commit level when both lockfile and conventional commits exist', () => {
+        const workspaces = [
+          createWorkspace({
+            name: 'pkg-a',
+            conventionalCommitsSinceStable: [
+              {
+                abbrevHash: 'abc123',
+                subject: {
+                  type: 'feat',
+                  breaking: false,
+                  description: 'add feature',
+                },
+              },
+            ],
+            lockfileCommitsSinceStable: [
+              {abbrevHash: 'def456', subject: 'chore: update deps'},
+            ],
+          }),
+        ];
+
+        const result = addBumpLevels({
+          workspaces,
+          onStableBranch: true,
+          bumpOnLockfileChange: true,
+        });
+
+        expect(result[0]?.bumpLevel).toBe('minor');
+      });
+
+      it('should not bump when no changes', () => {
+        const workspaces = [createWorkspace({name: 'pkg-a'})];
+
+        const result = addBumpLevels({
+          workspaces,
+          onStableBranch: true,
+          bumpOnLockfileChange: true,
+        });
+
+        expect(result[0]?.bumpLevel).toBeUndefined();
+      });
+
+      it('should handle multiple workspaces independently', () => {
+        const workspaces = [
+          createWorkspace({
+            name: 'pkg-a',
+            conventionalCommitsSinceStable: [
+              {
+                abbrevHash: 'abc123',
+                subject: {
+                  type: 'fix',
+                  breaking: false,
+                  description: 'fix bug',
+                },
+              },
+            ],
+          }),
+          createWorkspace({
+            name: 'pkg-b',
+            lockfileCommitsSinceStable: [
+              {abbrevHash: 'def456', subject: 'chore: update deps'},
+            ],
+          }),
+          createWorkspace({name: 'pkg-c'}),
+        ];
+
+        const result = addBumpLevels({
+          workspaces,
+          onStableBranch: true,
+          bumpOnLockfileChange: true,
+        });
+
+        expect(result[0]?.bumpLevel).toBe('patch'); // pkg-a: has fix
+        expect(result[1]?.bumpLevel).toBe('patch'); // pkg-b: lockfile only
+        expect(result[2]?.bumpLevel).toBeUndefined(); // pkg-c: no changes
+      });
+    });
+
+    describe('with bumpOnLockfileChange disabled', () => {
+      it('should not bump when only lockfile changed', () => {
+        const workspaces = [
+          createWorkspace({
+            name: 'pkg-a',
+            lockfileCommitsSinceStable: [
+              {abbrevHash: 'abc123', subject: 'chore: update deps'},
+            ],
+          }),
+        ];
+
+        const result = addBumpLevels({
+          workspaces,
+          onStableBranch: true,
+          bumpOnLockfileChange: false,
+        });
+
+        expect(result[0]?.bumpLevel).toBeUndefined();
+      });
+
+      it('should bump based on conventional commits only', () => {
+        const workspaces = [
+          createWorkspace({
+            name: 'pkg-a',
+            conventionalCommitsSinceStable: [
+              {
+                abbrevHash: 'abc123',
+                subject: {
+                  type: 'feat',
+                  breaking: false,
+                  description: 'add feature',
+                },
+              },
+            ],
+            lockfileCommitsSinceStable: [
+              {abbrevHash: 'def456', subject: 'chore: update deps'},
+            ],
+          }),
+        ];
+
+        const result = addBumpLevels({
+          workspaces,
+          onStableBranch: true,
+          bumpOnLockfileChange: false,
+        });
+
+        expect(result[0]?.bumpLevel).toBe('minor');
+      });
+
+      it('should not bump when no conventional commits', () => {
+        const workspaces = [
+          createWorkspace({
+            name: 'pkg-a',
+            lockfileCommitsSinceStable: [
+              {abbrevHash: 'abc123', subject: 'chore: update deps'},
+              {abbrevHash: 'def456', subject: 'docs: update readme'},
+            ],
+          }),
+        ];
+
+        const result = addBumpLevels({
+          workspaces,
+          onStableBranch: true,
+          bumpOnLockfileChange: false,
+        });
+
+        expect(result[0]?.bumpLevel).toBeUndefined();
+      });
+    });
+  });
+
+  describe('on prerelease branch', () => {
+    describe('with bumpOnLockfileChange enabled', () => {
+      it('should not bump when no changes', () => {
+        const workspaces = [createWorkspace({name: 'pkg-a'})];
+
+        const result = addBumpLevels({
+          workspaces,
+          onStableBranch: false,
+          bumpOnLockfileChange: true,
+        });
+
+        expect(result[0]?.bumpLevel).toBeUndefined();
+      });
+      it('should bump patch when only lockfile changed', () => {
+        const workspaces = [
+          createWorkspace({
+            name: 'pkg-a',
+            lockfileCommitsSincePrerelease: [
+              {abbrevHash: 'abc123', subject: 'chore: update deps'},
+            ],
+          }),
+        ];
+
+        const result = addBumpLevels({
+          workspaces,
+          onStableBranch: false,
+          bumpOnLockfileChange: true,
+        });
+
+        expect(result[0]?.bumpLevel).toBe('patch');
+      });
+
+      it('should bump patch when lockfile changed and new commits are only on stable', () => {
+        const workspaces = [
+          createWorkspace({
+            name: 'pkg-a',
+            conventionalCommitsSinceStable: [
+              {
+                abbrevHash: 'abc123',
+                subject: {
+                  type: 'feat',
+                  breaking: false,
+                  description: 'add feature',
+                },
+              },
+            ],
+            lockfileCommitsSincePrerelease: [
+              {abbrevHash: 'def456', subject: 'chore: update deps'},
+            ],
+          }),
+        ];
+
+        const result = addBumpLevels({
+          workspaces,
+          onStableBranch: false,
+          bumpOnLockfileChange: true,
+        });
+
+        expect(result[0]?.bumpLevel).toBe('patch');
+      });
+
+      it('should use conventional commit level when both exist', () => {
+        const workspaces = [
+          createWorkspace({
+            name: 'pkg-a',
+            conventionalCommitsSincePrerelease: [
+              {
+                abbrevHash: 'def456',
+                subject: {
+                  type: 'feat',
+                  breaking: false,
+                  description: 'new feature',
+                },
+              },
+            ],
+            lockfileCommitsSincePrerelease: [
+              {abbrevHash: 'ghi789', subject: 'chore: update deps'},
+            ],
+          }),
+        ];
+
+        const result = addBumpLevels({
+          workspaces,
+          onStableBranch: false,
+          bumpOnLockfileChange: true,
+        });
+
+        expect(result[0]?.bumpLevel).toBe('patch');
+      });
+
+      it('should patch bump to sync when all prerelease commits are on stable', () => {
+        const workspaces = [
+          createWorkspace({
+            name: 'pkg-a',
+            conventionalCommitsSincePrerelease: [
+              {
+                abbrevHash: 'abc123',
+                subject: {
+                  type: 'feat',
+                  breaking: false,
+                  description: 'feature',
+                },
+              },
+            ],
+          }),
+        ];
+
+        const result = addBumpLevels({
+          workspaces,
+          onStableBranch: false,
+          bumpOnLockfileChange: true,
+        });
+
+        // should patch bump even though the commit is a feature
+        // because it's already released on stable and we are just bumping to sync the branches
+        expect(result[0]?.bumpLevel).toBe('patch');
+      });
+    });
+
+    describe('with bumpOnLockfileChange disabled', () => {
+      it('should not bump when only lockfile changed', () => {
+        const workspaces = [
+          createWorkspace({
+            name: 'pkg-a',
+            lockfileCommitsSincePrerelease: [
+              {abbrevHash: 'abc123', subject: 'chore: update deps'},
+            ],
+          }),
+        ];
+
+        const result = addBumpLevels({
+          workspaces,
+          onStableBranch: false,
+          bumpOnLockfileChange: false,
+        });
+
+        expect(result[0]?.bumpLevel).toBeUndefined();
+      });
+
+      it('should bump based on conventional commits only', () => {
+        const workspaces = [
+          createWorkspace({
+            name: 'pkg-a',
+            conventionalCommitsSinceStable: [
+              {
+                abbrevHash: 'def456',
+                subject: {
+                  type: 'feat',
+                  breaking: true,
+                  description: 'breaking change',
+                },
+              },
+            ],
+            conventionalCommitsSincePrerelease: [
+              {
+                abbrevHash: 'def456',
+                subject: {
+                  type: 'feat',
+                  breaking: true,
+                  description: 'breaking change',
+                },
+              },
+            ],
+            lockfileCommitsSincePrerelease: [
+              {abbrevHash: 'ghi789', subject: 'chore: update deps'},
+            ],
+          }),
+        ];
+
+        const result = addBumpLevels({
+          workspaces,
+          onStableBranch: false,
+          bumpOnLockfileChange: false,
+        });
+
+        expect(result[0]?.bumpLevel).toBe('major');
+      });
+    });
   });
 });

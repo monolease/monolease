@@ -10,7 +10,7 @@ import {addNextVersions} from './utils/semver.js';
 import type {ConfigInput, PackageManager} from './types.js';
 import {validateConfig} from './utils/config.js';
 import {parseConfig} from './utils/parsers.js';
-export type {ConfigInput, ConventionalCommit} from './types.js';
+export type {ConfigInput, ConventionalCommit, Commit} from './types.js';
 
 export interface RunParams {
   config: ConfigInput;
@@ -41,11 +41,13 @@ export default async function run({
   });
   const withCommits = await addConventionalCommits({
     workspaces: withLatestTags,
+    packageManager,
     cwd: gitRootDir,
   });
   const withBumpLevels = addBumpLevels({
     workspaces: withCommits,
     onStableBranch,
+    bumpOnLockfileChange: config.bumpOnLockfileChange,
   });
   const withBumpedWorkspaceDeps = addBumpedWorkspaceDeps({
     workspaces: withBumpLevels,

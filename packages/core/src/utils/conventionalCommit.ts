@@ -5,8 +5,10 @@ import type {
   Commit,
   ConventionalCommit,
   ConventionalCommitSubject,
+  PackageManager,
 } from '../types.js';
 import {parseConventionalCommitSubject} from './parsers.js';
+import {getLockfileName} from './lockfile.js';
 
 export const subjectRegex =
   /^(?<type>feat|fix)(\((?<scope>.+)\))?((?<breaking>!))?: (?<description>.+)$/;
@@ -89,16 +91,19 @@ export function calculateSemverIncLevel(
 
 interface AddConventionalCommitsOptions {
   workspaces: Awaited<ReturnType<typeof addLatestTags>>;
+  packageManager: PackageManager;
   cwd?: string;
 }
 
 export async function addConventionalCommits({
   workspaces,
+  packageManager,
   cwd,
 }: AddConventionalCommitsOptions) {
+  const lockfileName = getLockfileName(packageManager);
   return Promise.all(
     workspaces.map(async workspace => {
-      const commitsSinceLatestPrerelease = await listCommits(
+      const workspaceCommitsSinceLatestPrerelease = await listCommits(
         {
           paths: [workspace.dir],
           revisionRange:
@@ -109,9 +114,31 @@ export async function addConventionalCommits({
         cwd,
       );
 
-      const commitsSinceLatestStable = await listCommits(
+      const lockfileCommitsSinceLatestPrerelease = await listCommits(
+        {
+          paths: [lockfileName],
+          revisionRange:
+            workspace.latestVersion.prerelease?.raw ?
+              `${workspace.latestVersion.prerelease.raw}..HEAD`
+            : undefined,
+        },
+        cwd,
+      );
+
+      const workspaceCommitsSinceLatestStable = await listCommits(
         {
           paths: [workspace.dir],
+          revisionRange:
+            workspace.latestVersion.stable?.raw ?
+              `${workspace.latestVersion.stable.raw}..HEAD`
+            : undefined,
+        },
+        cwd,
+      );
+
+      const lockfileCommitsSinceLatestStable = await listCommits(
+        {
+          paths: [lockfileName],
           revisionRange:
             workspace.latestVersion.stable?.raw ?
               `${workspace.latestVersion.stable.raw}..HEAD`
@@ -123,10 +150,18 @@ export async function addConventionalCommits({
       return {
         ...workspace,
         commits: {
-          sinceLatestPrelease: parseConventionalCommits(
-            commitsSinceLatestPrerelease,
-          ),
-          sinceLatestStable: parseConventionalCommits(commitsSinceLatestStable),
+          sinceLatestPrerelease: {
+            conventionalTouchingWorkspace: parseConventionalCommits(
+              workspaceCommitsSinceLatestPrerelease,
+            ),
+            touchingLockfile: lockfileCommitsSinceLatestPrerelease,
+          },
+          sinceLatestStable: {
+            conventionalTouchingWorkspace: parseConventionalCommits(
+              workspaceCommitsSinceLatestStable,
+            ),
+            touchingLockfile: lockfileCommitsSinceLatestStable,
+          },
         },
       };
     }),
@@ -136,33 +171,58 @@ export async function addConventionalCommits({
 interface AddBumpLevelsOptions {
   workspaces: Awaited<ReturnType<typeof addConventionalCommits>>;
   onStableBranch: boolean;
+  bumpOnLockfileChange: boolean;
 }
+
 export function addBumpLevels({
   workspaces,
   onStableBranch,
+  bumpOnLockfileChange,
 }: AddBumpLevelsOptions) {
   return workspaces.map(workspace => {
     let bumpLevel: ReleaseType | undefined;
     if (onStableBranch) {
-      bumpLevel = calculateSemverIncLevel(workspace.commits.sinceLatestStable);
-    } else {
-      // only consider commits that are not already released on stable
-      const filteredCommits = workspace.commits.sinceLatestPrelease.filter(
-        commit =>
-          workspace.commits.sinceLatestStable.some(
-            stableCommit => stableCommit.abbrevHash === commit.abbrevHash,
-          ),
+      bumpLevel = calculateSemverIncLevel(
+        workspace.commits.sinceLatestStable.conventionalTouchingWorkspace,
       );
       if (
-        filteredCommits.length === 0 &&
-        workspace.commits.sinceLatestPrelease.length > 0
+        !bumpLevel &&
+        bumpOnLockfileChange &&
+        workspace.commits.sinceLatestStable.touchingLockfile.length > 0
+      ) {
+        bumpLevel = 'patch';
+      }
+    } else {
+      // get all prerelease conventional commits that that are not already released on stable
+      // i.e. the commits are waiting for release on both branches
+      const filteredWorkspaceCommits =
+        workspace.commits.sinceLatestPrerelease.conventionalTouchingWorkspace.filter(
+          commit =>
+            workspace.commits.sinceLatestStable.conventionalTouchingWorkspace.some(
+              stableCommit => stableCommit.abbrevHash === commit.abbrevHash,
+            ),
+        );
+      if (
+        filteredWorkspaceCommits.length === 0 &&
+        workspace.commits.sinceLatestPrerelease.conventionalTouchingWorkspace
+          .length > 0
       ) {
         // all commits on the prerelease branch are already released on the stable branch
         // we should patch bump to create a new prerelease version to bring the
         // prerelease branch up to date with the stable branch
         bumpLevel = 'patch';
       } else {
-        bumpLevel = calculateSemverIncLevel(filteredCommits);
+        // some commits on the prerelease branch are not yet released on stable
+        // use those to calculate the bump level
+        bumpLevel = calculateSemverIncLevel(filteredWorkspaceCommits);
+      }
+      if (
+        !bumpLevel &&
+        bumpOnLockfileChange &&
+        workspace.commits.sinceLatestPrerelease.touchingLockfile.length > 0
+      ) {
+        // no conventional commit caused a bump, but lockfile changed, so patch bump
+        bumpLevel = 'patch';
       }
     }
     return {
