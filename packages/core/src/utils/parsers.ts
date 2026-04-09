@@ -15,6 +15,7 @@ export function parseConfig(configInput: ConfigInput): Config {
     pushTags: configInput.pushTags ?? true,
     dryRun: configInput.dryRun ?? false,
     bumpOnLockfileChange: configInput.bumpOnLockfileChange ?? false,
+    ignoreWorkspaces: configInput.ignoreWorkspaces ?? [],
   };
 }
 
