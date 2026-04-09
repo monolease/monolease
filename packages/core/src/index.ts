@@ -29,10 +29,13 @@ export default async function run({
   validateConfig({config, currentBranch});
   const onStableBranch = config.stable.branch === currentBranch;
   const releaseTags = parseReleaseTags(await listTags(undefined, gitRootDir));
-  const workspaces = await listWorkspaces({
+  const allWorkspaces = await listWorkspaces({
     rootDir: gitRootDir,
     packageManager,
   });
+  const workspaces = allWorkspaces.filter(
+    w => !config.ignoreWorkspaces.includes(w.name),
+  );
   const withWorkspaceDeps = addWorkspaceDeps({workspaces});
   const withLatestTags = addLatestTags({
     config,

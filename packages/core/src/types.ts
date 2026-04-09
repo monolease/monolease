@@ -13,13 +13,29 @@ export interface ConfigInput {
   pushTags?: boolean | undefined;
   dryRun?: boolean | undefined;
   bumpOnLockfileChange?: boolean | undefined;
+  /**
+   * An array of workspace package names to completely exclude from the release
+   * pipeline. Ignored workspaces will not receive version bumps, git tags,
+   * GitHub releases, or npm publishes.
+   *
+   * Use this for workspaces that should never be released, such as example apps
+   * or internal tooling.
+   *
+   * If you only want to skip npm publishing but still create tags and GitHub
+   * releases, set `"private": true` in the workspace's package.json instead.
+   */
+  ignoreWorkspaces?: string[] | undefined;
 }
 
 export interface Config
-  extends Omit<ConfigInput, 'pushTags' | 'dryRun' | 'bumpOnLockfileChange'> {
+  extends Omit<
+    ConfigInput,
+    'pushTags' | 'dryRun' | 'bumpOnLockfileChange' | 'ignoreWorkspaces'
+  > {
   dryRun: boolean;
   pushTags: boolean;
   bumpOnLockfileChange: boolean;
+  ignoreWorkspaces: string[];
 }
 
 export interface PkgJson {

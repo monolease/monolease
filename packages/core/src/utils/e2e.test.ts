@@ -220,6 +220,20 @@ describe('e2e', () => {
     ]);
   }, 7500);
 
+  it('should ignore workspaces listed in ignoreWorkspaces', async () => {
+    await setupRootWorkspace();
+    await addWorkspaces();
+    await gitAdd({all: true}, repoDir);
+    await commit('feat: initial commit', repoDir);
+    const result = await run({
+      config: {...config, ignoreWorkspaces: ['b']},
+      packageManager: 'yarn',
+      cwd: repoDir,
+    });
+    expect(result.workspaces).toHaveLength(1);
+    expect(result.workspaces[0].name).toBe('a');
+  });
+
   it('should version correcly when merging stable to prerelease and adding additional commits', async () => {
     await setupRootWorkspace();
     await addWorkspaces();
